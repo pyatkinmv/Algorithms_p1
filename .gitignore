@@ -90,3 +90,5 @@ fabric.properties
 !/libs/
 
 .DS_store
+
+vcs.xml
