@@ -63,19 +63,4 @@ public class Stack<Item> implements Iterable<Item> {
             return item;
         }
     }
-
-    public static void main(String[] args) {
-
-        Queue<Integer> queue = new Queue<>();
-        for (int i = 0; i < 10; i += 2)
-            queue.enqueue(i);
-
-        queue.enqueue(null);
-        queue.enqueue(10);
-        for(Integer i: queue)
-            System.out.println(i);
-
-
-
-    }
 }

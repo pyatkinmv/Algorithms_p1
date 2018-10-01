@@ -26,7 +26,7 @@ public class Queue<Item> implements Iterable<Item> {
     }
 
     public Item dequeue() {
-        if (isEmpty()) throw new IllegalStateException("Stack is empty");
+        if (isEmpty()) throw new NoSuchElementException("Queue is empty");
 
         Item item =  head.item;
         head = head.next;
@@ -39,27 +39,24 @@ public class Queue<Item> implements Iterable<Item> {
         return size;
     }
 
-    @Override
     public Iterator<Item> iterator() {
-        return new QueueIterator();
-    }
+        return new Iterator<Item>() {
+            Node<Item> current = head;
 
-    private class QueueIterator implements  Iterator<Item> {
-        Node<Item> current = head;
+            @Override
+            public boolean hasNext() {
+                return current != null;
+            }
 
-        @Override
-        public boolean hasNext() {
-            return current != null;
-        }
+            @Override
+            public Item next() {
+                if (!hasNext()) throw new NoSuchElementException("There is no next element in queue");
 
-        @Override
-        public Item next() {
-            if(!hasNext()) throw new NoSuchElementException("There is no next element in stack");
-
-            Item item = current.item;
-            current = current.next;
-            return item;
-        }
+                Item item = current.item;
+                current = current.next;
+                return item;
+            }
+        };
     }
 
 }
