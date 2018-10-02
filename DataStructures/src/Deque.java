@@ -1,33 +1,36 @@
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
 // A double-ended queue or deque (pronounced “deck”)
 // is a generalization of a stack and a queue that supports
 // adding and removing items from either the front or the back of the data structure.
 
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-
 public class Deque<Item> implements Iterable<Item> {
 
-    private int size = 0;
+    private int size;
 
     private Node<Item> first;
     private Node<Item> last;
+
+    public Deque() {
+        size = 0;
+        first = null;
+        last = null;
+    }
 
     private class Node<Item> {
         Item item;
         Node<Item> next;
         Node<Item> previous;
-    }
 
-    public Deque() {
-        first = null;
-        last = null;
     }
-
     public boolean isEmpty() { return size() == 0; }
 
     public int size() { return size; }
 
     public void addFirst(Item item) {
+        if (item == null) throw new java.lang.IllegalArgumentException("Argument of addFirst is null");
+
         Node<Item> oldFirst = first;
         first = new Node<>();
         first.item = item;
@@ -44,6 +47,8 @@ public class Deque<Item> implements Iterable<Item> {
     }
 
     public void addLast(Item item) {
+        if (item == null) throw new java.lang.IllegalArgumentException("Argument of addLast is null");
+
         Node<Item> oldLast = last;
         last = new Node<>();
         last.item = item;
@@ -81,43 +86,32 @@ public class Deque<Item> implements Iterable<Item> {
         return item;
     }
 
+    @Override
     public Iterator<Item> iterator() {
-        return new Iterator<Item>() {
-            Node<Item> current = first;
-
-            @Override
-            public boolean hasNext() {
-                return current != null;
-            }
-
-            @Override
-            public Item next() {
-                if (!hasNext()) throw new NoSuchElementException("There is no next element in queue");
-
-                Item item = current.item;
-                current = current.next;
-                return item;
-            }
-        };
+        return new DequeIterator();
     }
 
-    public static void main(String[] args){
-        Deque<Integer> deque = new Deque<>();
-        for (int i = 0; i < 10; ++i)
-            deque.addLast(i);
+    private class DequeIterator implements Iterator<Item> {
 
-        Queue<Integer> queue = new Queue<>();
-        for (int i = 0; i < 10; ++i)
-            queue.enqueue(i);
+        Node<Item> current = first;
 
-        for(Integer i: deque)
-            System.out.println(i);
+        @Override
+        public boolean hasNext() {
+            return current != null;
+        }
 
-        System.out.println("\n ____________________ \n");
+        @Override
+        public Item next() {
+            if (!hasNext()) throw new NoSuchElementException("There is no next element in queue");
 
-        for(Integer i: queue)
-            System.out.println(i);
+            Item item = current.item;
+            current = current.next;
+            return item;
+        }
 
-
-    }   // unit testing (optional)
+        @Override
+        public void remove() {
+            throw new java.lang.UnsupportedOperationException("Removing elements is forbidden while iterating");
+        }
+    }
 }

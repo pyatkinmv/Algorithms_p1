@@ -1,24 +1,22 @@
-
-
 import edu.princeton.cs.algs4.StdRandom;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-//    A randomized queue is similar to a stack or
-//    queue, except that the item removed is chosen
-//    uniformly at random from items in the data structure.
+// A randomized queue is similar to a stack or queue, except that the item
+// removed is chosen uniformly at random from items in the data structure.
+
 public class RandomizedQueue<Item> implements Iterable<Item> {
 
     private static final double INCREASE_THRESHOLD = 0.75;
     private static final double DECREASE_THRESHOLD = 0.25;
-
+    private static final int INITIAL_ARRAY_DIMENSION = 8;
 
     private Item[] arr;
     private int size;
 
     public RandomizedQueue() {
-        arr = (Item[]) new  Object[8];
+        arr = (Item[]) new  Object[INITIAL_ARRAY_DIMENSION];
         size = 0;
     }
 
@@ -32,10 +30,11 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
             copy[i] = arr[i];
         }
         arr = copy;
-        System.out.println("RESIZE, capacity = " + capacity);
     }
 
     public void enqueue(Item item) {
+        if (item == null) throw new java.lang.IllegalArgumentException("Argument of enqueue is null");
+
         arr[size++] = item;
 
         if (size() >= arr.length * INCREASE_THRESHOLD) resize(2 * arr.length);
@@ -50,7 +49,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         arr[size] = null;
         if (size() > 0 && size() <= DECREASE_THRESHOLD * arr.length) resize(arr.length / 2);
         return item;
-    }          // remove and return a random item
+    }
 
     public Item sample() {
         if (isEmpty()) throw new NoSuchElementException("Randomized Queue is empty");
@@ -61,46 +60,38 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 
     @Override
     public Iterator<Item> iterator() {
-        return new Iterator<Item>() {
-            private int i = 0;
-
-            @Override
-            public boolean hasNext() {
-                return arr[i] != null;
-            }
-
-            @Override
-            public Item next() {
-                if (!hasNext()) throw new NoSuchElementException("There is no next element in Randomized Queue");
-
-                return arr[i++];
-            }
-        };
+        return new RandomizedQueueIterator();
     }
 
+    private class RandomizedQueueIterator implements Iterator<Item> {
+        private final int[] order;
 
-    public static void main(String[] args){
-        RandomizedQueue<Integer> rq = new RandomizedQueue<>();
-        for (int i = 0; i < 16; ++i)
-            rq.enqueue(i);
-        for(Integer i: rq)
-            System.out.println(i);
+        private int i;
 
-//        for (int i = 0; i < 64; ++i)
-//            rq.dequeue();
-//
-//        for (int i = 0; i < 32; ++i)
-//            rq.enqueue(i);
-//
-//        for (int i = 0; i < 64; ++i)
-//            rq.dequeue();
-//
-//        //for (int i = 0; i < 32; ++i)
-//            rq.dequeue();
-//
-//        for(Integer i: rq)
-//            System.out.println(i);
+        public RandomizedQueueIterator()
+        {
+            i = 0;
+            order = new int[size()];
+            for (int j = 0; j < size(); ++j)
+                order[j] = j;
+            StdRandom.shuffle(order, 0, size());
+        }
 
-    }   // unit testing (optional)
+        @Override
+        public boolean hasNext() {
+            return i < size();
+        }
 
+        @Override
+        public Item next() {
+            if (!hasNext()) throw new NoSuchElementException("There is no next element in Randomized Queue");
+
+            return arr[order[i++]];
+        }
+
+        @Override
+        public void remove() {
+            throw new java.lang.UnsupportedOperationException("Removing elements is forbidden while iterating");
+        }
+    }
 }
