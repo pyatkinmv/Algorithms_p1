@@ -3,55 +3,66 @@ import java.util.Arrays;
 import java.util.List;
 
 public class FastCollinearPoints {
-    private List<LineSegment> segments;
-    private List<Double> slopes;
-    // finds all line segments containing 4 or more points
+    private final List<LineSegment> segments;
+
     public FastCollinearPoints(Point[] points) {
-        // this.points = points;
-        slopes = new ArrayList<>();
+        if (points == null) throw new IllegalArgumentException("Argument in the constructor is null");
+        if (containsNullPoint(points)) throw new IllegalArgumentException("points[] contains a null point");
+
+        Point[] tmpPoints = points.clone();
+        int n = tmpPoints.length;
         segments = new ArrayList<>();
-        int n = points.length;
 
-        for (int i = 0; i < n; ++i) {
-            Arrays.sort(points);
-            Point p = points[i];
-            Arrays.sort(points, p.slopeOrder());
+        Arrays.sort(tmpPoints);
+        if (containsRepeatedPoints(tmpPoints)) throw new IllegalArgumentException("points[] contains a repeated point");
 
-            int low = 1;
-            int high = 1;
-            while (high < n - 1) {
-                ++high;
-                if (p.slopeTo(points[low]) != p.slopeTo(points[high])) {
-                    if (high - low >= 3) {
+        // Sort the points according to the slopes they makes with i-th point.
+        // Looking for all subarrays of >= 3 length with the same values in all cells
+        // Variables last and first point out the first and last indices of the subarray in the points[]
+        // All such subarrays are arrays of collinear points
+        for (int i = 0; i < n - 2; ++i) {
+            Arrays.sort(tmpPoints);
+            Arrays.sort(tmpPoints, tmpPoints[i].slopeOrder());
+            Point curr = tmpPoints[0];
 
-                        Point[] tmpPoints = new Point[high - low + 1];
-                        tmpPoints[0] = points[0];
+            int first = 1;
+            int last = 2;
 
-                        for (int k = low; k < high; ++k)
-                            tmpPoints[k - low + 1] = points[k];
-
-                        Arrays.sort(tmpPoints);
-                        Double slope = p.slopeTo(points[low]);
-                        segments.add(new LineSegment(tmpPoints[0], tmpPoints[high - low]));
-
-                    }
-                    low = high;
+            while (last < n) {
+                while (last < tmpPoints.length
+                        && Double.compare(curr.slopeTo(tmpPoints[first]), curr.slopeTo(tmpPoints[last])) == 0) {
+                    ++last;
                 }
+
+                if (last - first >= 3 && curr.compareTo(tmpPoints[first]) < 0)
+                    segments.add(new LineSegment(curr, tmpPoints[last - 1]));
+                first = last;
+                ++last;
             }
+
+
+
         }
     }
-        // Есть отсортированный массив, нужно найти для каждого элемента число вхождений
-        // вернуть надо "интервалы" от наименьшего индекса данного элемента до наибольшего индекса
-        // передаем
-    // the number of line segments
+
     public int numberOfSegments() {
         return segments.size();
     }
 
-    // the line segments
-    // возвращает все Linesegments, состоящие из 4-х элементов с учетом условий
+    private boolean containsNullPoint(Point[] points) {
+        for (Point p: points)
+            if (p == null) return true;
+            return false;
+    }
+
+    private boolean containsRepeatedPoints(Point[] points) {
+        int n = points.length;
+        for (int i = 0; i < n - 1; ++i)
+            if (points[i].compareTo(points[i + 1]) == 0) return true;
+            return false;
+    }
+
     public LineSegment[] segments() {
         return segments.toArray(new LineSegment[0]);
     }
-
 }

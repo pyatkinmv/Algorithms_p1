@@ -60,5 +60,4 @@ public class LineSegment {
     public int hashCode() {
         throw new UnsupportedOperationException();
     }
-
 }
