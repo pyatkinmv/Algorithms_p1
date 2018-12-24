@@ -1,10 +1,11 @@
-package ru.pyatkinmv;
+import edu.princeton.cs.algs4.In;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class Board {
+
     // construct a board from an n-by-n array of blocks
     // (where blocks[i][j] = block in row i, column j)
 
@@ -74,12 +75,17 @@ public class Board {
 
     // a board that is obtained by exchanging any pair of blocks
     public Board twin() {
-        return this;
+        int row = (emptyRow == 0) ? 1 : 0;
+        int col = 0;
+        int row2 = (emptyCol == 0) ? 1 : 0;
+        int col2 = 1;
+
+        return swap(row, col, row2, col2);
     }
 
     // does this board equal y?
     public boolean equals(Object y) {
-        if (y == null || !(y instanceof Board)) return false;
+        if (!(y instanceof Board)) return false;
 
         Board that = (Board) y;
 
@@ -88,37 +94,35 @@ public class Board {
 
     // all neighboring boards
     public Iterable<Board> neighbors() {
-        int row = -1;
-        int col = -1;
 
         List<Board> boards = new ArrayList<>();
 
-        if (row > 0) {
-            boards.add(swap(row - 1, col));
+        if (emptyRow > 0) {
+            boards.add(swap(emptyRow, emptyCol, emptyRow - 1, emptyCol));
         }
 
-        if (row < n - 1) {
-            boards.add(swap(row + 1, col));
+        if (emptyRow < n - 1) {
+            boards.add(swap(emptyRow, emptyCol, emptyRow + 1, emptyCol));
         }
 
-        if (col > 0) {
-            boards.add(swap(row, col - 1));
+        if (emptyCol > 0) {
+            boards.add(swap(emptyRow, emptyCol, emptyRow, emptyCol - 1));
         }
 
-        if (col < n - 1) {
-            boards.add(swap(row, col + 1));
+        if (emptyCol < n - 1) {
+            boards.add(swap(emptyRow, emptyCol, emptyRow, emptyCol + 1));
         }
 
         return boards;
     }
 
-    private Board swap(int newRow, int newCol) {
-        blocks[emptyCol][emptyCol] = blocks[newRow][newCol];
-        blocks[newRow][newCol] = 0;
+    private Board swap(int oldRow, int oldCol, int newRow, int newCol) {
+        int temp = blocks[oldRow][oldCol];
+        blocks[oldRow][oldCol] = blocks[newRow][newCol];
+        blocks[newRow][newCol] = temp;
         Board board = new Board(blocks);
-        blocks[newRow][newCol] = blocks[emptyRow][emptyCol];
-        blocks[emptyRow][emptyCol] = 0;
-
+        blocks[newRow][newCol] = blocks[oldRow][oldCol];
+        blocks[oldRow][oldCol] = temp;
         return board;
     }
 
@@ -139,16 +143,17 @@ public class Board {
     // unit tests (not graded)
     public static void main(String[] args) {
 
-        int[][] arr = {
-                {1, 8, 3},
-                {4, 0, 2},
-                {7, 6 ,5}
-        };
-        Board board = new Board(arr);
-
-        System.out.println(board.manhattan());
-        System.out.println(board.hamming());
-        System.out.println(board.toString());
+        In in = new In(args[0]);
+        int n = in.readInt();
+        int[][] blocks = new int[n][n];
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++)
+                blocks[i][j] = in.readInt();
+        Board initial = new Board(blocks);
+        System.out.println(initial);
+        System.out.println();
+        System.out.println(initial.twin());
 
     }
+
 }
