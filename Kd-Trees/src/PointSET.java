@@ -1,5 +1,3 @@
-package ru.pyatkinmv;
-
 public class PointSET {
 
     // construct an empty set of points

@@ -1,5 +1,3 @@
-package ru.pyatkinmv;
-
 public class RectHV {
 
     // construct the rectangle [xmin, xmax] x [ymin, ymax]

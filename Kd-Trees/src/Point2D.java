@@ -1,5 +1,3 @@
-package ru.pyatkinmv;
-
 public class Point2D implements Comparable<Point2D> {
     private double x;
     private double y;
